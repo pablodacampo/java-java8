@@ -12,13 +12,12 @@ import java8.data.Person;
  */
 public class Function_06_Test {
 
-
     // tag::formatAge[]
     // TODO compléter la méthode
     // TODO la méthode retourne une chaîne de caractères de la forme [age=<AGE>] (exemple : [age=12])
     String formatAge(Supplier<Person> supplier) {
         // TODO
-        return null;
+        return "[age="+supplier.get().getAge()+"]";
     }
     // end::formatAge[]
 
@@ -26,7 +25,8 @@ public class Function_06_Test {
     @Test
     public void test_supplier_formatAge() throws Exception {
         // TODO compléter le test unitaire pour qu'il soit passant
-        String result = formatAge(null);
+    	Supplier<Person> supplier = () -> new Person("Paul", "Pot", 35, "libre");
+        String result = formatAge(supplier);
 
         assert result.equals("[age=35]");
     }
