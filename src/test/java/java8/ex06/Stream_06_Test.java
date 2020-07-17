@@ -1,13 +1,13 @@
 package java8.ex06;
 
-import org.junit.Test;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 /**
  * Exercice 07 - Stream Parallel - Effet de bord
@@ -29,18 +29,26 @@ public class Stream_06_Test {
         private long total;
 
         private void add(long value) {
-            total += value;
+            total+=value;
         }
     }
+    
+//    private class Accumulator {
+//        private AtomicLong total=new AtomicLong(0);
+//
+//        private void add(long value) {
+//        	total.addAndGet(value);
+//        }
+//    }
 
     // TODO compléter la méthode pour que le calcul de la somme soit fait avec une instance d'Accumulator
     private long sumWithAccumulator(long n) {
         // TODO créer une instance de l'accumulateur (classe Accumulator)
-        Accumulator acc = null;
+        Accumulator acc = new Accumulator();
         LongStream longStream = LongStream.rangeClosed(1, n - 1);
 
         // TODO pour chaque élément de longStream, invoquer la méthode add de l'accumulateur (acc)
-
+        longStream.forEach(value -> acc.add(value));
         return acc.total;
     }
 
@@ -58,7 +66,12 @@ public class Stream_06_Test {
 
     // TODO reprendre le code de sumWithAccumulator et rendre le traitement parallèle (.parallel())
     private long sumWithAccumulatorParallel(long n) {
-        return 0;
+    	Accumulator acc = new Accumulator();
+        LongStream longStream = LongStream.rangeClosed(1, n - 1);
+
+        // TODO pour chaque élément de longStream, invoquer la méthode add de l'accumulateur (acc)
+        longStream.parallel().forEach(value -> acc.add(value));
+        return acc.total;
     }
 
     // TODO Exécuter le test
@@ -73,6 +86,9 @@ public class Stream_06_Test {
             long result3 = sumWithAccumulatorParallel(n);
 
             assertThat("n=" + n, result1, is(result2));
+            
+            // On constate que la méthode add de la classe Accumulator n'est pas "thread safe". 
+            // Pour cela il faut faire l'addition avec l'instance de Accumulator en commentaires et qui utilise AtomicLong.
             assertThat("n=" + n, result1, is(result3));
 
             Logger.getGlobal().info("Test ok avec n=" + n);
